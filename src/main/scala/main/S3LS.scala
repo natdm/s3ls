@@ -1,8 +1,14 @@
 package main
 
+import com.amazonaws.SDKGlobalConfiguration
+import com.amazonaws.auth.AWSCredentials
+import com.amazonaws.auth.profile.ProfileCredentialsProvider
+
 import scala.util.Try
 import scala.util.Success
 import scala.util.Failure
+import com.amazonaws.services.s3.{AmazonS3Client, AmazonS3ClientBuilder}
+import com.amazonaws.auth.SystemPropertiesCredentialsProvider
 
 sealed trait Credential
 case class AwsID(id: String) extends Credential
@@ -18,6 +24,13 @@ object Main extends App {
     case Left(ex) => println(ex)
     case Right(creds) => println(creds)
   }
+//  Credentials.setProfile(AwsCredential(...))
+  S3Client.list
+}
+
+object S3Client {
+  lazy val client = AmazonS3ClientBuilder.defaultClient()
+  def list: Unit = println(client.listBuckets())
 }
 
 // Credentials is used for parsing the AWS Credentials file
@@ -25,6 +38,11 @@ object Main extends App {
 object Credentials {
   val AwsAccessKeyID = "aws_access_key_id"
   val AwsSecretAccessKey = "aws_secret_access_key"
+
+  def setProfile(creds: AwsCredential): Unit = {
+    println(System.setProperty(SDKGlobalConfiguration.ACCESS_KEY_SYSTEM_PROPERTY, creds.id.id))
+    println(System.setProperty(SDKGlobalConfiguration.SECRET_KEY_SYSTEM_PROPERTY, creds.key.key))
+  }
 
   def config: Either[String, Seq[AwsLogin]] =
     fromFile match {
@@ -52,6 +70,7 @@ object Credentials {
           cred.copy(key = AwsKey(key.split(" = ")(1)))
         case id: String if id.contains(AwsAccessKeyID) =>
           cred.copy(id = AwsID(id.split(" = ")(1)))
+        case _ => cred
       }
     }
 
