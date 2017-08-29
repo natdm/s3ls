@@ -1,0 +1,6 @@
+name := "S3LS"
+
+version := "1.0"
+
+scalaVersion := "2.10.4"
+    
