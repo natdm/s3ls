@@ -1,14 +1,11 @@
 package main
 
 import com.amazonaws.SDKGlobalConfiguration
-import com.amazonaws.auth.AWSCredentials
-import com.amazonaws.auth.profile.ProfileCredentialsProvider
 
 import scala.util.Try
 import scala.util.Success
 import scala.util.Failure
-import com.amazonaws.services.s3.{AmazonS3Client, AmazonS3ClientBuilder}
-import com.amazonaws.auth.SystemPropertiesCredentialsProvider
+import com.amazonaws.services.s3.AmazonS3ClientBuilder
 
 sealed trait Credential
 case class AwsID(id: String) extends Credential
